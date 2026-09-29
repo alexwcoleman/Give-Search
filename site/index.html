@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GiveWP Snippets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+  :root {
+    --paper: #F6F7F4;
+    --ink: #17231D;
+    --muted: #5C6B63;
+    --line: #D6DED8;
+    --accent: #1F7A4D;
+    --accent-ink: #FFFFFF;
+    --chip: #E4ECE6;
+    --mark: #CDEBD6;
+    --code-bg: #1B2620;
+    --sans: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #121A16;
+      --ink: #E6EDE8;
+      --muted: #97A69D;
+      --line: #2A3830;
+      --accent: #5CC28A;
+      --accent-ink: #0E1512;
+      --chip: #1E2A23;
+      --mark: #2D5A40;
+      --code-bg: #0C120F;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 400 17px/1.55 var(--sans);
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 48px 20px 96px; }
+
+  header h1 {
+    margin: 0 0 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  /* The one bold element: the search field itself */
+  .search { position: relative; margin: 8px 0 20px; }
+  .search input {
+    width: 100%;
+    border: 0;
+    border-bottom: 3px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    font: 700 clamp(2rem, 6vw, 3.4rem)/1.15 var(--sans);
+    letter-spacing: -0.02em;
+    padding: 6px 48px 10px 0;
+    outline: none;
+  }
+  .search input::placeholder { color: var(--line); }
+  .search input:focus { border-bottom-color: var(--accent); }
+  .search kbd {
+    position: absolute; right: 0; bottom: 18px;
+    font: 600 0.8rem var(--mono);
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1px 7px;
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .tag {
+    font: 600 0.9rem var(--sans);
+    border: 1px solid transparent;
+    background: var(--chip);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 5px 13px;
+    cursor: pointer;
+  }
+  .tag span { color: var(--muted); font-weight: 400; margin-left: 4px; }
+  .tag:hover { border-color: var(--line); }
+  .tag[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .tag[aria-pressed="true"] span { color: inherit; opacity: 0.8; }
+
+  .status { font-size: 0.95rem; color: var(--muted); margin-bottom: 8px; min-height: 1.5em; }
+
+  ul.results { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .item { border-bottom: 1px solid var(--line); }
+  .item > button {
+    all: unset;
+    display: block;
+    width: 100%;
+    padding: 16px 4px;
+    cursor: pointer;
+  }
+  .item > button:focus-visible, .item.active > button { background: var(--chip); }
+  .item h2 { margin: 0; font-size: 1.2rem; font-weight: 600; line-height: 1.3; }
+  .item p { margin: 3px 0 0; color: var(--muted); }
+  .item .meta { margin-top: 6px; font-size: 0.85rem; color: var(--muted); }
+  .item .meta b { font-weight: 600; color: var(--accent); }
+  mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1px; }
+
+  .code { display: none; padding: 0 0 18px; }
+  .item.open .code { display: block; }
+  .code-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .code-bar small { color: var(--muted); font-family: var(--mono); }
+  .copy {
+    font: 600 0.9rem var(--sans);
+    background: var(--ink); color: var(--paper);
+    border: 0; border-radius: 6px; padding: 6px 14px; cursor: pointer;
+  }
+  pre { margin: 0; border-radius: 8px; overflow-x: auto; background: var(--code-bg); }
+  pre code.hljs { background: transparent; font: 0.88rem/1.6 var(--mono); padding: 16px 18px; }
+
+  .empty { padding: 40px 0; color: var(--muted); }
+  .empty button { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 560px) { .search kbd { display: none; } .search input { padding-right: 0; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>GiveWP snippets &amp; fixes</h1></header>
+
+  <div class="search">
+    <input id="q" type="search" aria-label="Search snippets" placeholder="Search snippets…" autocomplete="off" spellcheck="false" autofocus>
+    <kbd>/</kbd>
+  </div>
+
+  <div class="tags" id="tags" role="group" aria-label="Filter by tag"></div>
+  <div class="status" id="status" aria-live="polite">Loading snippets…</div>
+  <ul class="results" id="results"></ul>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script type="module">
+import MiniSearch from 'https://cdn.jsdelivr.net/npm/minisearch@7.1.1/+esm';
+
+const $q = document.getElementById('q');
+const $tags = document.getElementById('tags');
+const $status = document.getElementById('status');
+const $results = document.getElementById('results');
+
+let snippets = [];
+let byId = new Map();
+let activeTag = null;
+let current = [];      // results currently shown
+let cursor = -1;       // keyboard-highlighted row
+const MAX = 150;
+
+const ms = new MiniSearch({
+  fields: ['title', 'description', 'tagText', 'code'],
+  storeFields: ['id'],
+  searchOptions: {
+    prefix: true,
+    fuzzy: 0.2,
+    combineWith: 'AND',
+    boost: { title: 4, tagText: 3, description: 2, code: 1 }
+  }
+});
+
+const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function highlight(text, terms) {
+  if (!terms || !terms.length || !text) return esc(text || '');
+  const re = new RegExp('(' + terms.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi');
+  return text.split(re).map((part, i) => (i % 2 ? `<mark>${esc(part)}</mark>` : esc(part))).join('');
+}
+
+function renderTags() {
+  const counts = {};
+  snippets.forEach((s) => s.tags.forEach((t) => (counts[t] = (counts[t] || 0) + 1)));
+  $tags.innerHTML = Object.keys(counts).sort().map((t) =>
+    `<button class="tag" data-tag="${esc(t)}" aria-pressed="${t === activeTag}">${esc(t)}<span>${counts[t]}</span></button>`
+  ).join('');
+}
+
+function render() {
+  const q = $q.value.trim();
+  let results = q
+    ? ms.search(q).map((r) => ({ ...byId.get(r.id), terms: r.terms }))
+    : snippets.map((s) => ({ ...s, terms: [] }));
+  if (activeTag) results = results.filter((s) => s.tags.includes(activeTag));
+
+  current = results.slice(0, MAX);
+  cursor = -1;
+
+  const n = results.length;
+  $status.textContent = n === 1 ? '1 snippet' : `${n} snippets`;
+
+  if (!n) {
+    $results.innerHTML = `<li class="empty">No snippets match${q ? ` “${esc(q)}”` : ''}${activeTag ? ` tagged ${esc(activeTag)}` : ''}. <button id="reset">Clear search and tags</button></li>`;
+    document.getElementById('reset').onclick = () => { $q.value = ''; activeTag = null; renderTags(); update(); $q.focus(); };
+    return;
+  }
+
+  $results.innerHTML = current.map((s, i) => `
+    <li class="item" data-i="${i}" id="${esc(s.slug)}">
+      <button aria-expanded="false">
+        <h2>${highlight(s.title, s.terms)}</h2>
+        ${s.description ? `<p>${highlight(s.description, s.terms)}</p>` : ''}
+        <div class="meta">${s.tags.map((t) => t === activeTag ? `<b>${esc(t)}</b>` : esc(t)).join(', ')}</div>
+      </button>
+      <div class="code"></div>
+    </li>`).join('');
+}
+
+function toggle(li, forceOpen) {
+  const s = current[+li.dataset.i];
+  const open = forceOpen ?? !li.classList.contains('open');
+  li.classList.toggle('open', open);
+  li.querySelector('button').setAttribute('aria-expanded', open);
+  const box = li.querySelector('.code');
+  if (open && !box.dataset.ready) {
+    box.innerHTML = `
+      <div class="code-bar"><small>${esc(s.lang)}</small><button class="copy">Copy code</button></div>
+      <pre><code class="language-${esc(s.lang)}">${esc(s.code)}</code></pre>`;
+    if (window.hljs) hljs.highlightElement(box.querySelector('code'));
+    box.querySelector('.copy').onclick = async (e) => {
+      await navigator.clipboard.writeText(s.code);
+      e.target.textContent = 'Copied';
+      setTimeout(() => (e.target.textContent = 'Copy code'), 1500);
+    };
+    box.dataset.ready = '1';
+  }
+}
+
+function syncUrl() {
+  const p = new URLSearchParams();
+  if ($q.value.trim()) p.set('q', $q.value.trim());
+  if (activeTag) p.set('tag', activeTag);
+  const qs = p.toString();
+  history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+}
+
+function update() { render(); syncUrl(); }
+
+function moveCursor(delta) {
+  const rows = $results.querySelectorAll('.item');
+  if (!rows.length) return;
+  rows[cursor]?.classList.remove('active');
+  cursor = Math.max(0, Math.min(rows.length - 1, cursor + delta));
+  rows[cursor].classList.add('active');
+  rows[cursor].scrollIntoView({ block: 'nearest' });
+}
+
+// Events
+$q.addEventListener('input', update);
+$q.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown') { e.preventDefault(); moveCursor(1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); moveCursor(-1); }
+  else if (e.key === 'Enter' && cursor >= 0) { e.preventDefault(); toggle($results.querySelectorAll('.item')[cursor]); }
+  else if (e.key === 'Escape') { $q.value = ''; update(); }
+});
+$tags.addEventListener('click', (e) => {
+  const b = e.target.closest('.tag');
+  if (!b) return;
+  activeTag = activeTag === b.dataset.tag ? null : b.dataset.tag;
+  renderTags();
+  update();
+});
+$results.addEventListener('click', (e) => {
+  const b = e.target.closest('.item > button');
+  if (b) toggle(b.parentElement);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && document.activeElement !== $q) { e.preventDefault(); $q.focus(); $q.select(); }
+});
+
+// Load
+try {
+  const res = await fetch('snippets.json', { cache: 'no-cache' });
+  if (!res.ok) throw new Error(res.status);
+  snippets = await res.json();
+  byId = new Map(snippets.map((s) => [s.id, s]));
+  ms.addAll(snippets.map((s) => ({ ...s, tagText: s.tags.join(' ') })));
+
+  const p = new URLSearchParams(location.search);
+  $q.value = p.get('q') || '';
+  activeTag = p.get('tag');
+  renderTags();
+  render();
+
+  // Open a snippet directly from a #slug link
+  if (location.hash) {
+    const li = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (li) { toggle(li, true); li.scrollIntoView(); }
+  }
+} catch (err) {
+  $status.textContent = 'Snippets could not be loaded. Check that snippets.json was built and deployed.';
+}
+</script>
+</body>
+</html>
