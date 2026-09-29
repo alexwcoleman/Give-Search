@@ -1,0 +1,50 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 9 * * *'   # daily, to pick up changes in the source repo
+  workflow_dispatch:       # "Run workflow" button for a manual refresh
+
+env:
+  SOURCE_REPO: impress-org/givewp-snippet-library   # the repo to search
+  SOURCE_BRANCH: ''                                 # blank = its default branch
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check out snippet source repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.SOURCE_REPO }}
+          ref: ${{ env.SOURCE_BRANCH }}
+          path: source
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node build-index.js
+        env:
+          SNIPPETS_DIR: source
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
